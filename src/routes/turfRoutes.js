@@ -15,7 +15,6 @@ router.patch('/:id/slots', authMiddleware, turfController.updateSlotStatus);
 router.post('/:id/slots', authMiddleware, turfController.addSlots);
 router.delete('/:id/slots', authMiddleware, turfController.deleteSlot);
 router.patch('/:id/slots', authMiddleware, turfController.updateSlot);
-router.patch('/:id/slots', authMiddleware, turfController.updateBulkSlotStatus);
 router.get('/:id/slots', authMiddleware, turfController.getSlots);
 
 module.exports = router;
