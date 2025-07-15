@@ -64,6 +64,66 @@ class TurfController {
         }
     }
 
+
+    // Add slots to a turf
+    async addSlots(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { slots } = req.body;
+
+            if (!Array.isArray(slots) || slots.length === 0) {
+                throw new BadRequest('slots must be a non-empty array');
+            }
+
+            const turf = await turfService.addSlots(id, slots, req.userId);
+            res.status(201).json(turf);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Get all slots of a turf
+    async getSlots(req, res, next) {
+        try {
+            const { id } = req.params;
+            const turf = await turfService.getTurfById(id);
+            res.json(turf.availableSlots);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Update a specific slot by ID
+    async updateSlot(req, res, next) {
+        try {
+            const { id, slotId } = req.params;
+            const { slotData } = req.body;
+
+            if (!slotData || typeof slotData !== 'object') {
+                throw new BadRequest('slotData must be an object');
+            }
+
+            const turf = await turfService.updateSlot(id, slotId, slotData, req.userId);
+            res.json(turf);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Delete a specific slot by ID
+    async deleteSlot(req, res, next) {
+        try {
+            const { id, slotId } = req.params;
+            const turf = await turfService.deleteSlot(id, slotId, req.userId);
+            res.json(turf);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
+
+
     async updateSlotStatus(req, res, next) {
         try {
 
@@ -72,18 +132,18 @@ class TurfController {
             console.log("id", id);
             console.log("slotUpdates", slotUpdates);
             console.log("userId", req.userId);
-      
-          if (!Array.isArray(slotUpdates)) {
-            throw new BadRequest('slotUpdates must be an array');
-          }
-      
-          const turf = await turfService.updateSlotStatus(id, slotUpdates, req.userId);
-          res.json(turf);
+
+            if (!Array.isArray(slotUpdates)) {
+                throw new BadRequest('slotUpdates must be an array');
+            }
+
+            const turf = await turfService.updateSlotStatus(id, slotUpdates, req.userId);
+            res.json(turf);
         } catch (error) {
-          next(error);
+            next(error);
         }
-      }
-      
+    }
+
 }
 
 module.exports = new TurfController();

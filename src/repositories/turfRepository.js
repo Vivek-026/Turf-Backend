@@ -85,34 +85,61 @@ class TurfRepository {
         }
     }
 
-    async updateBulkSlotStatus(turfId, slotUpdates) {
-        try {
-            const update = { $set: {} };
-            const arrayFilters = [];
-    
-            slotUpdates.forEach((slot, index) => {
-                const day = slot.day;
-                const time = slot.time;
-                const isBooked = slot.isBooked;
-    
-                update.$set[`availableSlots.$[dayIndex${index}].slots.$[slotIndex${index}].isBooked`] = isBooked;
-    
-                arrayFilters.push({ [`dayIndex${index}.day`]: day });
-                arrayFilters.push({ [`slotIndex${index}.time`]: time });
-            });
-    
-            return await Turf.findOneAndUpdate(
-                { _id: turfId },
-                update,
-                {
-                    arrayFilters,
-                    new: true
-                }
-            ).exec();
-        } catch (error) {
-            throw error;
-        }
+    async addSlots(turfId, slots) {
+        return await Turf.findByIdAndUpdate(
+            turfId,
+            { $push: { availableSlots: { $each: slots } } },
+            { new: true }
+        ).exec();
     }
+
+    
+    async updateSlot(turfId, slotId, slotData) {
+        return await Turf.findOneAndUpdate(
+            { _id: turfId, 'availableSlots._id': slotId },
+            { $set: { 'availableSlots.$': { _id: slotId, ...slotData } } },
+            { new: true }
+        ).exec();
+    }
+
+    
+    async deleteSlot(turfId, slotId) {
+        return await Turf.findByIdAndUpdate(
+            turfId,
+            { $pull: { availableSlots: { _id: slotId } } },
+            { new: true }
+        ).exec();
+    }
+
+    
+    async updateBulkSlotStatus(turfId, slotUpdates) {
+        const turf = await Turf.findById(turfId);
+        if (!turf) throw new Error('Turf not found');
+
+        slotUpdates.forEach(update => {
+            const slot = turf.availableSlots.id(update.slotId);
+            if (slot) {
+                if (typeof update.isBooked !== 'undefined') {
+                    slot.isBooked = update.isBooked;
+                }
+                if (typeof update.price !== 'undefined') {
+                    slot.price = update.price;
+                }
+                if (typeof update.day !== 'undefined') {
+                    slot.day = update.day;
+                }
+                if (typeof update.time !== 'undefined') {
+                    slot.time = update.time;
+                }
+            }
+        });
+
+        await turf.save();
+        return turf;
+    }
+
+
+ 
     
 }
 

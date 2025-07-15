@@ -24,7 +24,7 @@ class UserService {
             const token = jwt.sign(
                 { userId: user._id, role: user.role },
                 JWT_SECRET,
-                { expiresIn: '24h' }
+                { expiresIn: '7d' }
             );
 
             return {
@@ -60,7 +60,7 @@ class UserService {
             const token = jwt.sign(
                 { userId: user._id, role: user.role },
                 JWT_SECRET,
-                { expiresIn: '24h' }
+                { expiresIn: '7d' }
             );
 
             return {

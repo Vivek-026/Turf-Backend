@@ -96,6 +96,69 @@ class TurfService {
         }
     }
 
+
+    // Add slots to a turf
+    async addSlots(turfId, slots, ownerId) {
+        try {
+            const turf = await this.getTurfById(turfId);
+
+            const isOwner = await isAdmin(ownerId);
+            if (turf.owner.toString() !== ownerId && !isOwner) {
+                throw new Forbidden('Not authorized to add slots');
+            }
+
+            return await turfRepository.addSlots(turfId, slots);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get all slots for a turf
+    async getSlots(turfId) {
+        try {
+            const turf = await this.getTurfById(turfId);
+            return turf.availableSlots;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Update a specific slot
+    async updateSlot(turfId, slotId, slotData, ownerId) {
+        try {
+            const turf = await this.getTurfById(turfId);
+
+            const isOwner = await isAdmin(ownerId);
+            if (turf.owner.toString() !== ownerId && !isOwner) {
+                throw new Forbidden('Not authorized to update slot');
+            }
+
+            return await turfRepository.updateSlot(turfId, slotId, slotData);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Delete a specific slot
+    async deleteSlot(turfId, slotId, ownerId) {
+        try {
+            const turf = await this.getTurfById(turfId);
+
+            const isOwner = await isAdmin(ownerId);
+            if (turf.owner.toString() !== ownerId && !isOwner) {
+                throw new Forbidden('Not authorized to delete slot');
+            }
+
+            return await turfRepository.deleteSlot(turfId, slotId);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+
+
+
     async updateSlotStatus(turfId, slotUpdates, ownerId) {
         try {
             // Get turf to check ownership
